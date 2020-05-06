@@ -7,10 +7,11 @@
 using indType = unsigned;
 using intensityType = unsigned;
 using edgeType = double;
-using seedPoint = std::pair<indType, indType>;
-using seedVec = std::vector<std::pair<indType, indType>>;
+// using seedPoint = std::pair<indType, indType>;
+// using seedVec = std::vector<std::pair<indType, indType>>;
 
 edgeType boundaryMetric(Color a, Color b);
+edgeType calcIntensity(Color pixel);
 
 // struct Seed
 // {
@@ -34,7 +35,7 @@ public:
 
     Graph::Graph(const Bitmap &bitmap);
 
-    void setSeed(seedVec &foreground, seedVec &background);
+    // void setSeed(seedVec &foreground, seedVec &background);
     void addEdge(indType start, indType end, edgeType capacity);
 
 private:
