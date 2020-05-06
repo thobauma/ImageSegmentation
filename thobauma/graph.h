@@ -1,41 +1,50 @@
 #include <stdlib.h>
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <string>
+#include <bitmap.h>
 
 using indType = unsigned;
+using intensityType = unsigned;
+using edgeType = double;
+using seedPoint = std::pair<indType, indType>;
+using seedVec = std::vector<std::pair<indType, indType>>;
 
-struct Node
+edgeType boundaryMetric(Color a, Color b);
+
+struct Seed
 {
-    int color;
-    std::map<indType,indType> neighbors_;
-
-    Node() : color{0} {};
+    std::vector<std::pair<indType, indType>> foreground;
+    std::vector<std::pair<indType, indType>> background;
 };
 
-
-struct extendedNode{
-    indType node, cost, from;
-    bool operator<(const extendedNode& n2) const
-    {
-        return this->cost > n2.cost;
-    }
+struct Vertex
+{
+    intensityType intensity;
+    std::unordered_map<indType, edgeType> neighbors;
+    Vertex() : intensity{0} {};
 };
 
 class Graph
 {
 public:
-    Graph(unsigned int numNodes);
-    
+    Graph(indType numVert);
+
     ~Graph();
 
-    void addEdge(indType start, indType end, unsigned int capacity);
+    Graph::Graph(const Bitmap &bitmap, Seed &seed_);
 
-    void minCut();
+    void setSeed(seedVec &foreground, seedVec &background);
+    void addEdge(indType start, indType end, edgeType capacity);
 
 private:
-    std::vector<Node> nodes_;
-    unsigned int numNodes_;
-    unsigned int source_;
-    unsigned int sink_;
+    std::vector<Vertex> nodes;
+    indType numVertices;
+    indType source;
+    indType sink;
+    edgeType capacity;
+    Seed seed;
+
+    void nEdges(const Bitmap &bitmap);
+    void tEdges(const Bitmap &bitmap);
 };
