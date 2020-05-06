@@ -12,11 +12,11 @@ using seedVec = std::vector<std::pair<indType, indType>>;
 
 edgeType boundaryMetric(Color a, Color b);
 
-struct Seed
-{
-    std::vector<std::pair<indType, indType>> foreground;
-    std::vector<std::pair<indType, indType>> background;
-};
+// struct Seed
+// {
+//     std::vector<std::pair<indType, indType>> foreground;
+//     std::vector<std::pair<indType, indType>> background;
+// };
 
 struct Vertex
 {
@@ -32,7 +32,7 @@ public:
 
     ~Graph();
 
-    Graph::Graph(const Bitmap &bitmap, Seed &seed_);
+    Graph::Graph(const Bitmap &bitmap);
 
     void setSeed(seedVec &foreground, seedVec &background);
     void addEdge(indType start, indType end, edgeType capacity);
@@ -40,10 +40,10 @@ public:
 private:
     std::vector<Vertex> nodes;
     indType numVertices;
-    indType source;
-    indType sink;
+    indType sourceS;
+    indType sinkT;
     edgeType capacity;
-    Seed seed;
+    // Seed seed;
 
     void nEdges(const Bitmap &bitmap);
     void tEdges(const Bitmap &bitmap);

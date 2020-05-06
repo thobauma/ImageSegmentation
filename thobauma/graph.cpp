@@ -8,6 +8,10 @@
 
 #define SIGMA 30
 
+edgeType calcIntensity(Color pixel)
+{
+    return 255 * (0.2126 * pixel.GetR() + 0.7152 * pixel.GetG() + 0.0722 * pixel.GetB());
+}
 
 indType ind(indType x, indType y, indType width)
 {
@@ -20,8 +24,12 @@ Graph::Graph(unsigned int numVert)
     nodes.resize(numVert);
 }
 
-Graph::Graph(const Bitmap &bitmap, Seed &seed_) : seed{seed_}
-{
+Graph::Graph(const Bitmap &bitmap)
+{   
+    indType width = bitmap.Width();
+    indType height = bitmap.Height();
+    this->sourceS = width * height;
+    this->sinkT = width * height + 1;
     nEdges(bitmap);
     tEdges(bitmap);
 }
@@ -68,13 +76,24 @@ void Graph::nEdges(const Bitmap &bitmap)
 
 void Graph::tEdges(const Bitmap& bitmap)
 {
-    indType numForeground = this->seed.foreground.size();
-    indType numBackground = this->seed.background.size();
-
+    // indType numForeground = this->seed.foreground.size();
+    // indType numBackground = this->seed.background.size();
+    indType width = bitmap.Width();
+    indType height = bitmap.Height();
+    for (indType x = 0; x < width; x++)
+    {
+        for(indType y = 0; y < height; y++)
+        {   
+            edgeType intensity = calcIntensity(bitmap(x,y));
+            addEdge(ind(x, y, width),sinkT, 255 - intensity);
+            addEdge(sourceS, ind(x, y, width), intensity);
+        }
+    }
 }
 
-edgeType boundaryMetric(Color a, Color b){
+edgeType boundaryMetric(Color a, Color b)
+{
     Color diff = a-b;
-    edgeType bd = 0.2126 * diff.GetR() + 0.7152 * diff.GetG() + 0.0722 * diff.GetB();
+    edgeType bd = calcIntensity(diff);
     return 100 * std::exp(-std::pow(bd,2)/(2*std::pow(SIGMA,2)));
 }
