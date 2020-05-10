@@ -2,16 +2,19 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
-#include <bitmap.h>
+#include "bitmap.h"
 
 using indType = unsigned;
 using intensityType = unsigned;
-using edgeType = double;
+using valueType = double;
+using edgeType = std::pair<valueType,valueType>;
+valueType EDGE_MAX = std::numeric_limits<valueType>::max();
+indType IND_MAX = std::numeric_limits<indType>::max();
 // using seedPoint = std::pair<indType, indType>;
 // using seedVec = std::vector<std::pair<indType, indType>>;
 
-edgeType boundaryMetric(Color a, Color b);
-edgeType calcIntensity(Color pixel);
+valueType boundaryMetric(Color a, Color b);
+valueType calcIntensity(Color pixel);
 
 // struct Seed
 // {
@@ -19,31 +22,53 @@ edgeType calcIntensity(Color pixel);
 //     std::vector<std::pair<indType, indType>> background;
 // };
 
-struct Vertex
+struct Edge
 {
+    valueType capacity;
+    valueType residual;
+    Edge(valueType cap): capacity{cap}, residual{cap} {};
+};
+
+struct Vertex
+{   
+    Color color;
+    bool visited;
     intensityType intensity;
-    std::unordered_map<indType, edgeType> neighbors;
-    Vertex() : intensity{0} {};
+    std::map<indType, Edge> neighbors;
+    Vertex() : intensity{0}, visited{0}, color{} {}
+    Vertex(Color c) : intensity{calcIntensity(c)} ,visited{0}, color{c} {}
 };
 
 class Graph
 {
 public:
-    Graph(indType numVert);
+    // Graph(indType numVert);
 
     ~Graph();
 
     Graph::Graph(const Bitmap &bitmap);
 
     // void setSeed(seedVec &foreground, seedVec &background);
-    void addEdge(indType start, indType end, edgeType capacity);
+    void addEdge(indType start, indType end, valueType capacity);
+
+    void minCut();
+    
+    valueType Graph::bfs(std::vector<indType>& path);
+
+    valueType edmondsKarp();
+
+    void partition(indType vertInd);
+
+    Bitmap graphToBitmap();
 
 private:
-    std::vector<Vertex> nodes;
+    std::vector<Vertex> vertices;
     indType numVertices;
-    indType sourceS;
-    indType sinkT;
-    edgeType capacity;
+    indType width;
+    indType height;
+    indType sourceInd;
+    indType sinkInd;
+    // valueType capacity;
     // Seed seed;
 
     void nEdges(const Bitmap &bitmap);
