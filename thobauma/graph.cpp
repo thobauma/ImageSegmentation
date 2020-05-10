@@ -4,9 +4,20 @@
 #include <string>
 #include <limits>
 
-#include "graph.h"
+#include "graph.hpp"
+
+#define DEBUG
 
 #define SIGMA 30
+// #ifndef EDGE_MAX 
+// #define EDGE_MAX
+valueType EDGE_MAX = std::numeric_limits<valueType>::max();
+// #endif /* EDGE_MAX */
+
+// #ifndef IND_MAX 
+// #define IND_MAX
+indType IND_MAX = std::numeric_limits<indType>::max();
+// #endif /* IND_MAX */
 
 
 indType ind(indType x, indType y, indType width)
@@ -32,21 +43,36 @@ valueType boundaryMetric(Color a, Color b)
 //     vertices.resize(numVert);
 // }
 
-Graph::Graph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.Height()}
+Graph::Graph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.Height()},
+                numVertices{bitmap.Width() * bitmap.Height() + 2}, vertices(bitmap.Width() * bitmap.Height() + 2, Vertex()),
+                sourceInd{bitmap.Width() * bitmap.Height()}, sinkInd{bitmap.Width() * bitmap.Height() + 1}
 {   
-    this->numVertices = width * height + 2;
-    this->sourceInd = width * height;
-    this->sinkInd = width * height + 1;
-    vertices.reserve(numVertices);
+    #ifdef DEBUG
+        std::cout <<  "width: " << width << std::endl;
+        std::cout <<  "height: " << height << std::endl;
+        std::cout <<  "numVertices: " << numVertices << std::endl;
+        std::cout <<  "vertices.size: " << vertices.size() << std::endl;
+    #endif
     for (indType x = 0; x < width; x++)
     {
         for(indType y = 0; y < height; y++)
-        {   
-            vertices[ind(x,y,width)] = Vertex(bitmap(x,y));
+        {
+            Vertex v(bitmap(x,y));
+            vertices[ind(x,y,width)] = v;
         }
     }
+    #ifdef DEBUG
+        std::cout <<  "vertices.size: " << vertices.size() << std::endl;
+        std::cout << "colors init" << std::endl;
+    #endif
     nEdges(bitmap);
+    #ifdef DEBUG
+        std::cout << "nEdges done" << std::endl;
+    #endif
     tEdges(bitmap);
+    #ifdef DEBUG
+        std::cout << "tEdges done" << std::endl;
+    #endif
 }
 
 Graph::~Graph()
@@ -57,8 +83,12 @@ Graph::~Graph()
 void Graph::addEdge(indType start, indType end, valueType capacity)
 {
     if (start < numVertices)
-    {
-        vertices[start].neighbors[end] = Edge(capacity);
+    {   
+        Edge e(capacity);
+        vertices[start].neighbors.insert({end, e});
+//        #ifdef DEBUG
+//            std::cout <<  "edge capacity: " << vertices[start].neighbors[end].capacity << std::endl;
+//        #endif
     }
     else
         std::cerr << "Node index out of bound!" << std::endl;
@@ -66,7 +96,6 @@ void Graph::addEdge(indType start, indType end, valueType capacity)
 
 void Graph::nEdges(const Bitmap &bitmap) 
 {
-    // valueType capacity_ = std::numeric_limits<valueType>::min();
     for (indType x = 0; x < width; x++)
     {
         for (indType y = (x % 2 == 0) ? 0 : 1; y < height; y += 2)
@@ -74,26 +103,31 @@ void Graph::nEdges(const Bitmap &bitmap)
             if (x + 1 < width)
             {
                 valueType bp_ij_right = boundaryMetric(bitmap(x, y), bitmap(x + 1, y));
-                addEdge(ind(x, y, width), ind(x + 1, y, width), bp_ij_right);
-                addEdge(ind(x + 1, y, width), ind(x, y, width), bp_ij_right);
-                // capacity_ = std::max(capacity_, bp_ij_right);
+                // indType i = ind(x, y, width);
+                // indType j = ind(x + 1, y, width);
+                // Edge e(bp_ij_right);
+                // this->vertices[i].neighbors.insert({j, e});
+                // this->vertices[j].neighbors.insert({i, e});
+               addEdge(ind(x, y, width), ind(x + 1, y, width), bp_ij_right);
+               addEdge(ind(x + 1, y, width), ind(x, y, width), bp_ij_right);
             }
             if (y + 1 < height)
             {
                 valueType bp_ij_low = boundaryMetric(bitmap(x, y), bitmap(x, y + 1));
-                addEdge(ind(x, y, width), ind(x, y + 1, width), bp_ij_low);
-                addEdge(ind(x, y + 1, width), ind(x, y, width), bp_ij_low);
-                // capacity_ = std::max(capacity_, bp_ij_low);
+                // indType i = ind(x, y, width);
+                // indType j = ind(x, y + 1, width);
+                // Edge e(bp_ij_low);
+                // vertices[i].neighbors.insert({j, e});
+                // this->vertices[j].neighbors.insert({i, e});
+               addEdge(ind(x, y, width), ind(x, y + 1, width), bp_ij_low);
+               addEdge(ind(x, y + 1, width), ind(x, y, width), bp_ij_low);
             }
         }
     }
-    // this->capacity = capacity_;
 }
 
 void Graph::tEdges(const Bitmap& bitmap)
 {
-    // indType numForeground = this->seed.foreground.size();
-    // indType numBackground = this->seed.background.size();
     for (indType x = 0; x < width; x++)
     {
         for(indType y = 0; y < height; y++)
@@ -163,37 +197,32 @@ void Graph::minCut()
 {
     valueType maxFlow = edmondsKarp();
     std::cout << "maxFlow: " << maxFlow << std::endl;
-    partition(sourceInd);
+    std::vector<indType> parent(numVertices, IND_MAX);
+    // partition(sourceInd);
+    std::cout << "bfs: " << bfs(parent) << std::endl;
+    #ifdef DEBUG
+        std::cout << "partition done" << std::endl;
+    #endif
     for (indType vInd = 0; vInd < numVertices; vInd++)
     {   
         Vertex v = vertices[vInd];
-        if (v.visited)
+        if (parent[vInd] != IND_MAX)
         {
-            for(auto it: v.neighbors)
-            {
-                if(!vertices[it.first].visited)
-                {
-                    vertices[it.first].color = Color(255/256,0,0);
-                }
-            }
+//            v.visited = 1;
+             for(auto it: v.neighbors)
+             {
+                 if(parent[it.first] == IND_MAX)
+                 {
+                     vertices[it.first].color = Color(255./256,0,0);
+                 }
+             }
         }
     }
+    #ifdef DEBUG
+        std::cout << "cut done" << std::endl;
+    #endif
 }
 
-void Graph::partition(indType vertInd)
-{
-    Vertex v = vertices[vertInd];
-    v.visited = 1;
-    for(auto it: vertices[vertInd].neighbors)
-    {
-        indType next = it.first;
-        Edge edge = it.second;
-        if(edge.residual > 0 && vertices[next].visited == 0)
-        {
-            partition(next);
-        }
-    }
-}
 
 Bitmap Graph::graphToBitmap()
 {
@@ -202,7 +231,12 @@ Bitmap Graph::graphToBitmap()
     {
         for(indType x = 0; x < width; ++x)
         {
-            result(x,y) = vertices[ind(x,y,width)].color;
+            Vertex v = vertices[ind(x,y,width)];
+//            if(v.visited)
+//                result(x,y) = Color(0,0,0);
+//            else
+//                result(x,y) = Color(1,1,1);
+            result(x,y) = v.color;
         }
     }
     return result;

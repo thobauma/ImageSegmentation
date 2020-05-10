@@ -2,14 +2,17 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
-#include "bitmap.h"
+#include <algorithm>
+#include "bitmap.hpp"
 
 using indType = unsigned;
-using intensityType = unsigned;
+// using intensityType = unsigned;
 using valueType = double;
-using edgeType = std::pair<valueType,valueType>;
-valueType EDGE_MAX = std::numeric_limits<valueType>::max();
-indType IND_MAX = std::numeric_limits<indType>::max();
+// using edgeType = std::pair<valueType,valueType>;
+
+
+
+
 // using seedPoint = std::pair<indType, indType>;
 // using seedVec = std::vector<std::pair<indType, indType>>;
 
@@ -27,16 +30,23 @@ struct Edge
     valueType capacity;
     valueType residual;
     Edge(valueType cap): capacity{cap}, residual{cap} {};
+    Edge(): capacity{0}, residual{0} {};
+    // Edge& operator=(Edge& e) noexcept
+    // {
+    //     std::swap(capacity, e.capacity);
+    //     std::swap(residual, e.residual);
+    //     return *this;
+    // }
 };
 
 struct Vertex
 {   
     Color color;
+    valueType intensity;
     bool visited;
-    intensityType intensity;
-    std::map<indType, Edge> neighbors;
-    Vertex() : intensity{0}, visited{0}, color{} {}
-    Vertex(Color c) : intensity{calcIntensity(c)} ,visited{0}, color{c} {}
+    std::unordered_map<indType, Edge> neighbors;
+    Vertex() : color{}, intensity{0}, visited{0} {}
+    Vertex(Color c) : color{c}, intensity{calcIntensity(c)} ,visited{0} {}
 };
 
 class Graph
@@ -46,18 +56,16 @@ public:
 
     ~Graph();
 
-    Graph::Graph(const Bitmap &bitmap);
+    Graph(const Bitmap &bitmap);
 
     // void setSeed(seedVec &foreground, seedVec &background);
     void addEdge(indType start, indType end, valueType capacity);
 
     void minCut();
     
-    valueType Graph::bfs(std::vector<indType>& path);
+    valueType bfs(std::vector<indType>& path);
 
     valueType edmondsKarp();
-
-    void partition(indType vertInd);
 
     Bitmap graphToBitmap();
 

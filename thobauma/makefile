@@ -1,20 +1,22 @@
 CC=g++
-CFLAGS=-O3 -std=c++17
-
+CXXFLAGS=-O3 -std=c++17
+CXXFLAGS += -Wall -Wextra -Wpedantic
 all: imageSegmentation
 
-bitmap.o: bitmap.cpp bitmap.h
-	$(CC) $(CFLAGS) -c bitmap.cpp
+bitmap.o: bitmap.cpp bitmap.hpp
+	$(CC) $(CXXFLAGS) -c $^
 
-graph.o: graph.cpp graph.h bitmap.h
-	$(CC) $(CFLAGS) -c graph.cpp
+graph.o: graph.cpp graph.hpp
+	$(CC) $(CXXFLAGS) -c $^
 
 
-main.o: main.cpp graph.h bitmap.h
-	$(CC) $(CFLAGS) -c main.cpp
+main.o: main.cpp graph.hpp
+	$(CC) $(CXXFLAGS) -c $^
 
 imageSegmentation: main.o graph.o bitmap.o
-	$(CC) $(CFLAGS) -o imageSegmentation main.o graph.o bitmap.o
-
+	$(CC) $(CXXFLAGS) -o $@ $^
 clean:
 	rm -f *.o 
+	rm -f *.hpp.gch
+	rm imageSegmentation
+	rm images/*.bmp

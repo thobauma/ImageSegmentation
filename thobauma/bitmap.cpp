@@ -19,7 +19,7 @@
 #include <iostream>
 #include <boost/unordered_map.hpp>
 
-#include "bitmap.h"
+#include "bitmap.hpp"
 
 
 Color::Color () :
