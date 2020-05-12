@@ -67,7 +67,12 @@ public:
 
     void minCut();
     
-    valueType bfs(std::vector<indType>& path);
+    bool bfs(std::vector<indType>& path);
+
+    void dfsUtil(indType v, std::vector<bool>& visited);
+
+    bool dfs(indType v, std::vector<bool>& visited);
+
 
     valueType edmondsKarp();
 

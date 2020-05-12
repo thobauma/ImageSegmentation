@@ -123,7 +123,7 @@ void Graph::tEdges(const Bitmap& bitmap)
     }
 }
 
-valueType Graph::bfs(std::vector<indType>& parent)
+bool Graph::bfs(std::vector<indType>& parent)
 {   
     std::queue<indType> queue;
     std::fill(parent.begin(), parent.end(), IND_MAX);
@@ -159,7 +159,21 @@ valueType Graph::bfs(std::vector<indType>& parent)
     return false;
 }
 
-
+void Graph::dfsUtil(indType v, std::vector<bool>& visited)
+{
+    visited[v] = 1;
+    for(auto it: vertices[v].neighbors)
+    {
+        if(!visited[it.first])
+        {
+            dfsUtil(it.first, visited);
+        }
+    }
+}
+bool Graph::dfs(indType v,std::vector<bool>& visited)
+{   
+    dfsUtil(v, visited);
+}
 
 valueType Graph::edmondsKarp()
 {   
@@ -183,8 +197,9 @@ valueType Graph::edmondsKarp()
             current = previous;
         }
         maxFlow += pathFlow;
-        
-        printTest();
+        #ifdef DEBUG
+            printTest();
+        #endif
     }
     return maxFlow;
 }
@@ -195,25 +210,29 @@ void Graph::minCut()
 {
     valueType maxFlow = edmondsKarp();
     std::cout << "maxFlow: " << maxFlow << std::endl;
-    std::vector<indType> parent(numVertices, IND_MAX);
-    // partition(sourceInd);
-    std::cout << "bfs: " << bfs(parent) << std::endl;
+    std::vector<bool> visited(numVertices, 0);
+    dfs(sourceInd, visited);
     #ifdef DEBUG
         std::cout << "partition done" << std::endl;
     #endif
-    for (indType vInd = 0; vInd < numVertices; vInd++)
-    {   
-        Vertex v = vertices[vInd];
-        if (parent[vInd] != IND_MAX)
+
+    for(indType i = 0;  i < numVertices; i++)
+    {
+        std::cout <<i <<":"<< visited[i] <<" ";
+    }
+    std::cout << std::endl;
+    for(indType i = 0; i < numVertices-2; i++){
+        Vertex v = vertices[i];
+        if(visited[i])
         {
-            v.visited = 1;
-             for(auto it: v.neighbors)
-             {
-                 if(parent[it.first] == IND_MAX)
-                 {
-                     vertices[it.first].color = Color(255./256,0,0);
-                 }
-             }
+            for(auto it: v.neighbors)
+            {
+                if(!visited[it.first])
+                {   
+                    v.color = Color(255./256, 0, 0);
+                    break;
+                }
+            }
         }
     }
     #ifdef DEBUG
@@ -230,10 +249,6 @@ Bitmap Graph::graphToBitmap()
         for(indType x = 0; x < width; ++x)
         {
             Vertex v = vertices[ind(x,y,width)];
-        //    if(v.visited)
-        //        result(x,y) = Color(0,0,0);
-        //    else
-        //        result(x,y) = Color(1,1,1);
             result(x,y) = v.color;
         }
     }
