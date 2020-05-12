@@ -4,6 +4,7 @@
 #include <string>
 #include <limits>
 #include <iomanip>
+#include <cmath>
 #include "graph.hpp"
 
 // #define DEBUG

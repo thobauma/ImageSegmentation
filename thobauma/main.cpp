@@ -1,5 +1,4 @@
 #include <iostream>
-#include <iomanip> // for setprecision
 
 #include "bitmap.hpp"
 #include "graph.hpp"
@@ -22,7 +21,6 @@ void ShowResult(const Bitmap& original, Graph& graph, const std::string& filenam
 
 void test(std::vector<std::string>& files)
 {
-    std::cout << std::setprecision(3); // don't remove
     for(auto filename: files)
     {   
         std::cout << std::endl << filename << ": " << std::endl;
@@ -34,7 +32,6 @@ void test(std::vector<std::string>& files)
 }
 
 int main(){
-    // std::cout << std::setprecision(3); // don't remove
     // std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
     // std::string filename;
     // #ifdef DEBUG
@@ -58,7 +55,7 @@ int main(){
     // #endif
     // ShowResult(bitmap, g, filename);
 
-    // std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
-    // test(files);
+    std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
+    test(files);
     return 0;
 }

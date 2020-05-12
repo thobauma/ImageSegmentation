@@ -18,7 +18,7 @@
 #include <cassert>
 #include <fstream>
 #include <algorithm>
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 struct Color
 {
@@ -73,9 +73,9 @@ private:
 	unsigned width, height;
 	std::vector<Color> pixels;
 		    	    
-	bool MakeColorTable (boost::unordered_map<unsigned int, unsigned int>& used_colors, unsigned int* color_table) const;
+	bool MakeColorTable (std::unordered_map<unsigned int, unsigned int>& used_colors, unsigned int* color_table) const;
 	unsigned int WriteUncompressedData (std::ostream& os) const;
-	unsigned int WriteCompressedData (std::ostream& os, boost::unordered_map<unsigned int, unsigned int>& used_colors) const;
+	unsigned int WriteCompressedData (std::ostream& os, std::unordered_map<unsigned int, unsigned int>& used_colors) const;
 	void WriteUncompressedChunk (std::ostream& os, unsigned char* bytes, unsigned int size) const;
 	    
 	static void Write (std::ostream&, float);

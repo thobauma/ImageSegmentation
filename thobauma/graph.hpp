@@ -6,7 +6,6 @@
 #include "bitmap.hpp"
 
 using indType = unsigned;
-
 using valueType = double;
 
 valueType boundaryMetric(Color a, Color b);
@@ -35,8 +34,10 @@ public:
     ~Graph();
 
     Graph(indType n, indType s, indType t): 
-        numVertices{n}, sourceInd{s}, sinkInd{t},
-        vertices(n, Vertex()) {};
+        vertices(n, Vertex()), numVertices{n},
+        width{0}, height{0},
+        sourceInd{s}, sinkInd{t}
+        {};
 
     Graph(const Bitmap &bitmap);
 
@@ -54,13 +55,6 @@ public:
     valueType edmondsKarp();
 
     Bitmap graphToBitmap();
-    
-    void printInfo();
-
-/// to delete
-    void printPath(std::vector<indType> parent);
-    void printParent(std::vector<indType> parent);
-    void printTest();
 
     indType getSource(){
         return sourceInd;
@@ -77,7 +71,11 @@ public:
     indType getHeight(){
         return height;
     }
-/// end delete
+    
+    void printInfo();
+    void printPath(std::vector<indType> parent);
+    void printParent(std::vector<indType> parent);
+    void printTest();
 
 private:
     std::vector<Vertex> vertices;

@@ -17,7 +17,7 @@
 #include <fstream>
 #include <algorithm>
 #include <iostream>
-#include <boost/unordered_map.hpp>
+#include <unordered_map>
 
 #include "bitmap.hpp"
 
@@ -118,7 +118,7 @@ void Bitmap::Save (const std::string& filename) const
     std::ofstream file (filename, std::ios::binary);
 
     // use RLE compression if less than 256 colors used
-    boost::unordered_map<unsigned int, unsigned int> used_colors;
+    std::unordered_map<unsigned int, unsigned int> used_colors;
     unsigned int color_table[256] = {0};
     unsigned int biBitCount;
 
@@ -192,7 +192,7 @@ unsigned int Bitmap::WriteUncompressedData (std::ostream& os) const {
     return (width * 3 + padding) * height;
 }
 
-bool Bitmap::MakeColorTable (boost::unordered_map<unsigned int, unsigned int>& used_colors, unsigned int* color_table) const {
+bool Bitmap::MakeColorTable (std::unordered_map<unsigned int, unsigned int>& used_colors, unsigned int* color_table) const {
     for (unsigned y = 0; y != height; ++y)
     {
         for (unsigned x = 0; x != width; ++x)
@@ -211,7 +211,7 @@ bool Bitmap::MakeColorTable (boost::unordered_map<unsigned int, unsigned int>& u
     return true;
 }
 
-unsigned int Bitmap::WriteCompressedData (std::ostream& os, boost::unordered_map<unsigned int, unsigned int>& used_colors) const {
+unsigned int Bitmap::WriteCompressedData (std::ostream& os, std::unordered_map<unsigned int, unsigned int>& used_colors) const {
     unsigned int dataSize = 0;
     for (unsigned y = height-1; y < height; --y)
     {
