@@ -20,4 +20,4 @@ clean:
 	rm -f *.hpp.gch
 	rm imageSegmentation
 	rm images/original/*
-	rm images/seg/*
+	rm images/segmented/*

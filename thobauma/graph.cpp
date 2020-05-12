@@ -9,15 +9,9 @@
 // #define DEBUG
 
 #define SIGMA 30
-// #ifndef EDGE_MAX 
-// #define EDGE_MAX
-valueType EDGE_MAX = std::numeric_limits<valueType>::max();
-// #endif /* EDGE_MAX */
 
-// #ifndef IND_MAX 
-// #define IND_MAX
+valueType EDGE_MAX = std::numeric_limits<valueType>::max();
 indType IND_MAX = std::numeric_limits<indType>::max();
-// #endif /* IND_MAX */
 
 
 indType ind(indType x, indType y, indType width)
@@ -76,16 +70,8 @@ Graph::~Graph()
 
 void Graph::addEdge(indType start, indType end, valueType capacity)
 {
-    if (start < numVertices)
-    {   
-        Edge e(capacity);
-        vertices[start].neighbors.insert({end, e});
-    //    #ifdef DEBUG
-    //        std::cout <<  "edge capacity: " << vertices[start].neighbors[end].capacity << std::endl;
-    //    #endif
-    }
-    else
-        std::cerr << "Node index out of bound!" << std::endl;
+    Edge e(capacity);
+    vertices[start].neighbors.insert({end, e});
 }
 
 void Graph::nEdges(const Bitmap &bitmap) 
@@ -212,12 +198,6 @@ void Graph::minCut()
     bfs(parent);
     #ifdef DEBUG
         std::cout << "partition done" << std::endl;
-        std::cout << "parents: " <<std::endl;
-        for(indType i = 0 ; i < numVertices; i++)
-        {
-            std::cout << i << ":" << parent[i] << " ";
-        }
-        std::cout << std::endl;
     #endif
     for (indType vInd = 0; vInd < numVertices; vInd++)
     {

@@ -6,3 +6,9 @@ thobauma/.ipynb_checkpoints/
 thobauma/build/
 
 thobauma/cmake-build-debug/
+
+*.o
+
+*.gch
+
+thobauma/imageSegmentation

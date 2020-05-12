@@ -6,24 +6,11 @@
 #include "bitmap.hpp"
 
 using indType = unsigned;
-// using intensityType = unsigned;
+
 using valueType = double;
-// using edgeType = std::pair<valueType,valueType>;
-
-
-
-
-// using seedPoint = std::pair<indType, indType>;
-// using seedVec = std::vector<std::pair<indType, indType>>;
 
 valueType boundaryMetric(Color a, Color b);
 valueType calcIntensity(Color pixel);
-
-// struct Seed
-// {
-//     std::vector<std::pair<indType, indType>> foreground;
-//     std::vector<std::pair<indType, indType>> background;
-// };
 
 struct Edge
 {
@@ -31,28 +18,19 @@ struct Edge
     valueType residual;
     Edge(valueType cap): capacity{cap}, residual{cap} {};
     Edge(): capacity{0}, residual{0} {};
-    // Edge& operator=(Edge& e) noexcept
-    // {
-    //     std::swap(capacity, e.capacity);
-    //     std::swap(residual, e.residual);
-    //     return *this;
-    // }
 };
 
 struct Vertex
 {   
     Color color;
-    valueType intensity;
-    bool visited;
     std::unordered_map<indType, Edge> neighbors;
-    Vertex() : color{}, intensity{0}, visited{0} {}
-    Vertex(Color c) : color{c}, intensity{calcIntensity(c)} ,visited{0} {}
+    Vertex() : color{} {};
+    Vertex(Color c) : color{c} {};
 };
 
 class Graph
 {
 public:
-    // Graph(indType numVert);
 
     ~Graph();
 
@@ -62,7 +40,6 @@ public:
 
     Graph(const Bitmap &bitmap);
 
-    // void setSeed(seedVec &foreground, seedVec &background);
     void addEdge(indType start, indType end, valueType capacity);
 
     void minCut();
@@ -93,6 +70,13 @@ public:
         return sinkInd;
     }
 
+    indType getWidth(){
+        return width;
+    }
+
+    indType getHeight(){
+        return height;
+    }
 /// end delete
 
 private:
@@ -102,8 +86,6 @@ private:
     indType height;
     indType sourceInd;
     indType sinkInd;
-    // valueType capacity;
-    // Seed seed;
 
     void nEdges(const Bitmap &bitmap);
     void tEdges(const Bitmap &bitmap);

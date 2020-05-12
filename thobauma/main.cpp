@@ -20,25 +20,6 @@ void ShowResult(const Bitmap& original, Graph& graph, const std::string& filenam
 
 }
 
-Graph testGraph()
-{
-    Graph g(6, 0, 5);
-    g.addEdge(0, 1,16);
-    g.addEdge(0, 2,13);
-    g.addEdge(1, 2,10);
-    g.addEdge(1, 3,12);
-    g.addEdge(2, 1, 4);
-    g.addEdge(2, 4,14);
-    g.addEdge(3, 2, 9);
-    g.addEdge(3, 5,20);
-    g.addEdge(4, 3, 7);
-    g.addEdge(4, 5, 4);
-    g.printTest();
-    auto mf = g.edmondsKarp();
-    std::cout << "max flow: " << mf << std::endl;
-    g.printTest();
-    return g;
-}
 void test(std::vector<std::string>& files)
 {
     std::cout << std::setprecision(3); // don't remove
@@ -53,9 +34,7 @@ void test(std::vector<std::string>& files)
 }
 
 int main(){
-    // Graph a = testGraph();
     // std::cout << std::setprecision(3); // don't remove
-    // // std::cout << "image name (e.g. bird, peppers or sailboat)?";
     // std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
     // std::string filename;
     // #ifdef DEBUG
@@ -70,17 +49,16 @@ int main(){
     // Graph g(bitmap);
     // #ifdef DEBUG
     //     std::cout << "graph initialized" << std::endl;
-    //     g.printTest();
+    //     // g.printTest();
     // #endif
     // g.minCut();
     // #ifdef DEBUG
-    //     g.printTest();
-    // // g.printInfo();
+    //     // g.printTest();
     //     std::cout << "minCut done" << std::endl;
     // #endif
     // ShowResult(bitmap, g, filename);
 
-    std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
-    test(files);
+    // std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
+    // test(files);
     return 0;
 }
