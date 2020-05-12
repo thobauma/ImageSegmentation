@@ -55,33 +55,33 @@ void test(std::vector<std::string>& files)
 
 int main(){
     // Graph a = testGraph();
-    std::cout << std::setprecision(3); // don't remove
-    // std::cout << "image name (e.g. bird, peppers or sailboat)?";
-    std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
-    std::string filename;
-    #ifdef DEBUG
-        filename = "debug";
-    #else
-        std::cin >> filename;
-    #endif
-    Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
-    #ifdef DEBUG
-        std::cout << std::endl << "bitmap initalized" << std::endl;
-    #endif
-    Graph g(bitmap);
-    #ifdef DEBUG
-        std::cout << "graph initialized" << std::endl;
-        g.printTest();
-    #endif
-    g.minCut();
-    #ifdef DEBUG
-        g.printTest();
-    // g.printInfo();
-        std::cout << "minCut done" << std::endl;
-    #endif
-    ShowResult(bitmap, g, filename);
+    // std::cout << std::setprecision(3); // don't remove
+    // // std::cout << "image name (e.g. bird, peppers or sailboat)?";
+    // std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
+    // std::string filename;
+    // #ifdef DEBUG
+    //     filename = "debug";
+    // #else
+    //     std::cin >> filename;
+    // #endif
+    // Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
+    // #ifdef DEBUG
+    //     std::cout << std::endl << "bitmap initalized" << std::endl;
+    // #endif
+    // Graph g(bitmap);
+    // #ifdef DEBUG
+    //     std::cout << "graph initialized" << std::endl;
+    //     g.printTest();
+    // #endif
+    // g.minCut();
+    // #ifdef DEBUG
+    //     g.printTest();
+    // // g.printInfo();
+    //     std::cout << "minCut done" << std::endl;
+    // #endif
+    // ShowResult(bitmap, g, filename);
 
     std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
-    // test(files);
+    test(files);
     return 0;
 }

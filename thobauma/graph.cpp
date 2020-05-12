@@ -204,41 +204,37 @@ valueType Graph::edmondsKarp()
     return maxFlow;
 }
 
-
-
 void Graph::minCut()
 {
     valueType maxFlow = edmondsKarp();
     std::cout << "maxFlow: " << maxFlow << std::endl;
-    std::vector<bool> visited(numVertices, 0);
-    dfs(sourceInd, visited);
+    std::vector<indType> parent(numVertices, IND_MAX);
+    // partition(sourceInd);
+    std::cout << "bfs: " << bfs(parent) << std::endl;
     #ifdef DEBUG
         std::cout << "partition done" << std::endl;
     #endif
-
-    for(indType i = 0;  i < numVertices; i++)
-    {
-        std::cout <<i <<":"<< visited[i] <<" ";
-    }
-    std::cout << std::endl;
-    for(indType i = 0; i < numVertices-2; i++){
-        Vertex v = vertices[i];
-        if(visited[i])
+    for (indType vInd = 0; vInd < numVertices; vInd++)
+    {   
+        Vertex v = vertices[vInd];
+        if (parent[vInd] != IND_MAX)
         {
-            for(auto it: v.neighbors)
-            {
-                if(!visited[it.first])
-                {   
-                    v.color = Color(255./256, 0, 0);
-                    break;
-                }
-            }
+            v.visited = 1;
+             for(auto it: v.neighbors)
+             {
+                 if(parent[it.first] == IND_MAX)
+                 {
+                     vertices[it.first].color = Color(255./256,0,0);
+                 }
+             }
         }
     }
     #ifdef DEBUG
         std::cout << "cut done" << std::endl;
     #endif
 }
+
+
 
 
 Bitmap Graph::graphToBitmap()
