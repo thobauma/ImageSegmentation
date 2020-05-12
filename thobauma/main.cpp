@@ -7,14 +7,12 @@
 
 void ShowResult(const Bitmap& original, Graph& graph, const std::string& filename){
     Bitmap resbmp = graph.graphToBitmap();
-    // std::stringstream s;
-    // s << filename << ".bmp";
     std::string originalF = "./images/original/"+filename+"Original.bmp";
     original.Save(originalF);
     #ifdef DEBUG
         std::cout << "original saved" << std::endl;
     #endif
-    std::string resultF = "./images/seg/"+filename+"Seg.bmp";
+    std::string resultF = "./images/segmented/"+filename+"Seg.bmp";
     resbmp.Save(resultF);
     #ifdef DEBUG
         std::cout << "segmented image saved" << std::endl;
@@ -45,7 +43,8 @@ void test(std::vector<std::string>& files)
 {
     std::cout << std::setprecision(3); // don't remove
     for(auto filename: files)
-    {
+    {   
+        std::cout << std::endl << filename << ": " << std::endl;
         Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
         Graph g(bitmap);
         g.minCut();

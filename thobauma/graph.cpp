@@ -6,7 +6,7 @@
 #include <iomanip>
 #include "graph.hpp"
 
-#define DEBUG
+// #define DEBUG
 
 #define SIGMA 30
 // #ifndef EDGE_MAX 
@@ -178,7 +178,7 @@ bool Graph::dfs(indType v,std::vector<bool>& visited)
 valueType Graph::edmondsKarp()
 {   
     valueType maxFlow = 0;
-    std::vector<indType> parent(6);
+    std::vector<indType> parent(numVertices);
     while(bfs(parent))
     {   
         indType current = sinkInd;
@@ -209,24 +209,33 @@ void Graph::minCut()
     valueType maxFlow = edmondsKarp();
     std::cout << "maxFlow: " << maxFlow << std::endl;
     std::vector<indType> parent(numVertices, IND_MAX);
-    // partition(sourceInd);
-    std::cout << "bfs: " << bfs(parent) << std::endl;
+    bfs(parent);
     #ifdef DEBUG
         std::cout << "partition done" << std::endl;
+        std::cout << "parents: " <<std::endl;
+        for(indType i = 0 ; i < numVertices; i++)
+        {
+            std::cout << i << ":" << parent[i] << " ";
+        }
+        std::cout << std::endl;
     #endif
     for (indType vInd = 0; vInd < numVertices; vInd++)
-    {   
-        Vertex v = vertices[vInd];
+    {
+        Vertex& v = vertices[vInd];
         if (parent[vInd] != IND_MAX)
         {
-            v.visited = 1;
-             for(auto it: v.neighbors)
-             {
-                 if(parent[it.first] == IND_MAX)
-                 {
-                     vertices[it.first].color = Color(255./256,0,0);
-                 }
-             }
+            for (auto it : v.neighbors)
+            {
+                if (it.first == sinkInd)
+                    continue;
+                if (parent[it.first] == IND_MAX)
+                {   
+                    #ifdef DEBUG
+                        std::cout << "ind: "<< vInd << std::endl;
+                    #endif
+                    v.color = Color(255. / 256, 0, 0);
+                }
+            }
         }
     }
     #ifdef DEBUG
@@ -299,11 +308,12 @@ void Graph::printTest()
         std::cout << "  Edges:    ";
         for(auto it: v.neighbors)
         {
-            std::cout << std::setw(2) << it.first << ":("
-                << std::setw(3) << it.second.capacity << ","
-                << std::setw(3) << it.second.residual << ")    ";
-            if(it.second.residual != it.second.capacity)
-                std::cout << "different! " << "   ";
+            std::cout << std::setw(2) << it.first << "  ";
+            // << ":("
+            //     << std::setw(3) << it.second.capacity << ","
+            //     << std::setw(3) << it.second.residual << ")    ";
+            // if(it.second.residual != it.second.capacity)
+            //     std::cout << "different! " << "   ";
         }
         std::cout << std::endl;
     }
