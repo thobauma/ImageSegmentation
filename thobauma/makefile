@@ -19,4 +19,5 @@ clean:
 	rm -f *.o 
 	rm -f *.hpp.gch
 	rm imageSegmentation
-	rm images/*.bmp
+	rm images/original/*
+	rm images/seg/*
