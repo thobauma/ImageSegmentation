@@ -56,6 +56,10 @@ public:
 
     ~Graph();
 
+    Graph(indType n, indType s, indType t): 
+        numVertices{n}, sourceInd{s}, sinkInd{t},
+        vertices(n, Vertex()) {};
+
     Graph(const Bitmap &bitmap);
 
     // void setSeed(seedVec &foreground, seedVec &background);
@@ -68,6 +72,23 @@ public:
     valueType edmondsKarp();
 
     Bitmap graphToBitmap();
+    
+    void printInfo();
+
+/// to delete
+    void printPath(std::vector<indType> parent);
+    void printParent(std::vector<indType> parent);
+    void printTest();
+
+    indType getSource(){
+        return sourceInd;
+    }
+
+    indType getSink(){
+        return sinkInd;
+    }
+
+/// end delete
 
 private:
     std::vector<Vertex> vertices;

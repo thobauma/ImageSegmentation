@@ -3,7 +3,7 @@
 #include <fstream>
 #include <string>
 #include <limits>
-
+#include <iomanip>
 #include "graph.hpp"
 
 #define DEBUG
@@ -34,14 +34,8 @@ valueType boundaryMetric(Color a, Color b)
 {
     Color diff = a-b;
     valueType bd = calcIntensity(diff);
-    return 100 * std::exp(-std::pow(bd,2)/(2*std::pow(SIGMA,2)));
+    return 1000 * std::exp(-std::pow(bd,2)/(2*std::pow(SIGMA,2)));
 }
-
-// Graph::Graph(unsigned int numVert)
-//     : numVertices{numVert}
-// {
-//     vertices.resize(numVert);
-// }
 
 Graph::Graph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.Height()},
                 numVertices{bitmap.Width() * bitmap.Height() + 2}, vertices(bitmap.Width() * bitmap.Height() + 2, Vertex()),
@@ -86,9 +80,9 @@ void Graph::addEdge(indType start, indType end, valueType capacity)
     {   
         Edge e(capacity);
         vertices[start].neighbors.insert({end, e});
-//        #ifdef DEBUG
-//            std::cout <<  "edge capacity: " << vertices[start].neighbors[end].capacity << std::endl;
-//        #endif
+    //    #ifdef DEBUG
+    //        std::cout <<  "edge capacity: " << vertices[start].neighbors[end].capacity << std::endl;
+    //    #endif
     }
     else
         std::cerr << "Node index out of bound!" << std::endl;
@@ -98,29 +92,19 @@ void Graph::nEdges(const Bitmap &bitmap)
 {
     for (indType x = 0; x < width; x++)
     {
-        for (indType y = (x % 2 == 0) ? 0 : 1; y < height; y += 2)
+        for (indType y = 0; y < height; y++)
         {
             if (x + 1 < width)
             {
                 valueType bp_ij_right = boundaryMetric(bitmap(x, y), bitmap(x + 1, y));
-                // indType i = ind(x, y, width);
-                // indType j = ind(x + 1, y, width);
-                // Edge e(bp_ij_right);
-                // this->vertices[i].neighbors.insert({j, e});
-                // this->vertices[j].neighbors.insert({i, e});
-               addEdge(ind(x, y, width), ind(x + 1, y, width), bp_ij_right);
-               addEdge(ind(x + 1, y, width), ind(x, y, width), bp_ij_right);
+                addEdge(ind(x, y, width), ind(x + 1, y, width), bp_ij_right);
+                addEdge(ind(x + 1, y, width), ind(x, y, width), bp_ij_right);
             }
             if (y + 1 < height)
             {
                 valueType bp_ij_low = boundaryMetric(bitmap(x, y), bitmap(x, y + 1));
-                // indType i = ind(x, y, width);
-                // indType j = ind(x, y + 1, width);
-                // Edge e(bp_ij_low);
-                // vertices[i].neighbors.insert({j, e});
-                // this->vertices[j].neighbors.insert({i, e});
-               addEdge(ind(x, y, width), ind(x, y + 1, width), bp_ij_low);
-               addEdge(ind(x, y + 1, width), ind(x, y, width), bp_ij_low);
+                addEdge(ind(x, y, width), ind(x, y + 1, width), bp_ij_low);
+                addEdge(ind(x, y + 1, width), ind(x, y, width), bp_ij_low);
             }
         }
     }
@@ -142,7 +126,7 @@ void Graph::tEdges(const Bitmap& bitmap)
 valueType Graph::bfs(std::vector<indType>& parent)
 {   
     std::queue<indType> queue;
-    parent.resize(numVertices, IND_MAX);
+    std::fill(parent.begin(), parent.end(), IND_MAX);
     queue.push(sourceInd);
     while(!queue.empty())
     {   
@@ -157,21 +141,32 @@ valueType Graph::bfs(std::vector<indType>& parent)
                 parent[next] = current;
                 if(next == sinkInd)
                 {   
+                    #ifdef DEBUG
+                        std::cout << "BFS: True" << std::endl;
+                        printParent(parent);
+                        printPath(parent);
+                    #endif
                     return true;
                 }
                 queue.push(next);
             }
         }
     }
+    #ifdef DEBUG
+        std::cout << "BFS: False" << std::endl;
+        printParent(parent);
+    #endif
     return false;
 }
 
+
+
 valueType Graph::edmondsKarp()
-{
+{   
     valueType maxFlow = 0;
-    std::vector<indType> parent;
+    std::vector<indType> parent(6);
     while(bfs(parent))
-    {
+    {   
         indType current = sinkInd;
         valueType pathFlow = EDGE_MAX;
         while(current != sourceInd)
@@ -188,9 +183,12 @@ valueType Graph::edmondsKarp()
             current = previous;
         }
         maxFlow += pathFlow;
+        
+        printTest();
     }
     return maxFlow;
 }
+
 
 
 void Graph::minCut()
@@ -208,7 +206,7 @@ void Graph::minCut()
         Vertex v = vertices[vInd];
         if (parent[vInd] != IND_MAX)
         {
-//            v.visited = 1;
+            v.visited = 1;
              for(auto it: v.neighbors)
              {
                  if(parent[it.first] == IND_MAX)
@@ -232,12 +230,90 @@ Bitmap Graph::graphToBitmap()
         for(indType x = 0; x < width; ++x)
         {
             Vertex v = vertices[ind(x,y,width)];
-//            if(v.visited)
-//                result(x,y) = Color(0,0,0);
-//            else
-//                result(x,y) = Color(1,1,1);
+        //    if(v.visited)
+        //        result(x,y) = Color(0,0,0);
+        //    else
+        //        result(x,y) = Color(1,1,1);
             result(x,y) = v.color;
         }
     }
     return result;
+}
+
+
+void Graph::printInfo()
+{
+    for(indType i = 0; i < numVertices-2; i++)
+    {   
+        Vertex v = vertices[i];
+        std::cout 
+            // << "Index: " 
+            << std::setw(2) << i << ": "
+            <<"(" << i % width << "," << i / width << "):" 
+            // << "  numEdges: " 
+            << v.neighbors.size() << " ";
+        std::cout
+            << "  Color:"
+            <<"[" << std::setw(5) << v.color.GetR()
+            << "," << std::setw(5) << v.color.GetG()
+            << "," << std::setw(5) << v.color.GetB() 
+            << "]";
+        // std::cout << "  Edges:    ";
+        for(auto it: v.neighbors)
+        {
+            std::cout << std::setw(2) << it.first << ": "
+                <<"("
+                << it.first % width << "," << it.first/ width << "): "
+                << std::setw(8) << it.second.capacity << ","
+                << std::setw(8) << it.second.residual << "  ";
+            if(it.second.residual != it.second.capacity)
+                std::cout << "different! " << "   ";
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "s: " << vertices[sourceInd].neighbors.size() << std::endl;
+    std::cout << "t: " << vertices[sinkInd].neighbors.size() << std::endl;
+}
+
+void Graph::printTest()
+{
+    for(indType i = 0; i < numVertices; i++)
+    {   
+        Vertex v = vertices[i];
+        std::cout 
+            << "Index: " 
+            << std::setw(2) << i << ": "
+            << "  numEdges: " 
+            << v.neighbors.size() << " ";
+        std::cout << "  Edges:    ";
+        for(auto it: v.neighbors)
+        {
+            std::cout << std::setw(2) << it.first << ":("
+                << std::setw(3) << it.second.capacity << ","
+                << std::setw(3) << it.second.residual << ")    ";
+            if(it.second.residual != it.second.capacity)
+                std::cout << "different! " << "   ";
+        }
+        std::cout << std::endl;
+    }
+}
+
+void Graph::printParent(std::vector<indType> parent)
+{
+    std::cout << "Parent: ";
+    for(indType curr = sinkInd; curr > sourceInd; curr--)
+    {
+        std::cout << curr << ":" << parent[curr] << " ";
+    }
+    std::cout << std::endl;
+}
+void Graph::printPath(std::vector<indType> parent)
+{                 
+    std::cout << "Path:   ";
+    indType curr = sinkInd;
+    while(curr != sourceInd){
+        std::cout << curr << ":"<< parent[curr] << "  ";
+        curr = parent[curr];
+    }
+   std::cout << std::endl;
 }
