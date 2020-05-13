@@ -2,7 +2,7 @@
 
 #include "bitmap.hpp"
 #include "graph.hpp"
-#define DEBUG
+// #define DEBUG
 
 void ShowResult(const Bitmap& original, Graph& graph, const std::string& filename){
     Bitmap resbmp = graph.graphToBitmap();
@@ -26,8 +26,8 @@ void test(std::vector<std::string>& files)
         std::cout << std::endl << filename << ": " << std::endl;
         Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
         Graph g(bitmap);
-        // g.prMinCut();
-        g.minCut();
+        g.prMinCut();
+        // g.minCut();
         ShowResult(bitmap, g, filename);
     }
 }
@@ -54,33 +54,34 @@ Graph testGraph()
 
 int main(){
     // testGraph();
-    std::string filename;
-    #ifndef DEBUG
-        std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
-    #endif
-    #ifdef DEBUG
-        filename = "debug";
-    #else
-        std::cin >> filename;
-    #endif
-    Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
-    #ifdef DEBUG
-        std::cout << std::endl << "bitmap initalized" << std::endl;
-    #endif
-    Graph g(bitmap);
-    #ifdef DEBUG
-        std::cout << "graph initialized" << std::endl;
-        g.printTest();
-    #endif
-    g.prMinCut();
-    // g.minCut();
-    #ifdef DEBUG
-        g.printTest();
-        std::cout << "minCut done" << std::endl;
-    #endif
-    ShowResult(bitmap, g, filename);
+    // std::string filename;
+    // #ifndef DEBUG
+    //     std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
+    // #endif
+    // #ifdef DEBUG
+    // #else
+    //     filename = "test1";
+    //     // std::cin >> filename;
+    // #endif
+    // Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
+    // #ifdef DEBUG
+    //     std::cout << std::endl << "bitmap initalized" << std::endl;
+    // #endif
+    // Graph g(bitmap);
+    // #ifdef DEBUG
+    //     std::cout << "graph initialized" << std::endl;
+    //     g.printTest();
+    // #endif
+    // g.prMinCut();
+    // // g.minCut();
+    // #ifdef DEBUG
+    //     g.printTest();
+    //     std::cout << "minCut done" << std::endl;
+    // #endif
+    // ShowResult(bitmap, g, filename);
 
-    // std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
-    // test(files);
+    std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
+    // // {"debug"};//
+    test(files);
     return 0;
 }

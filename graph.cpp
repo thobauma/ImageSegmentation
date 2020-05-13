@@ -7,7 +7,7 @@
 #include <cmath>
 #include "graph.hpp"
 
-#define DEBUG
+// #define DEBUG
 
 #define SIGMA 30
 
@@ -29,7 +29,7 @@ valueType boundaryMetric(Color a, Color b)
 {
     Color diff = a-b;
     valueType bd = calcIntensity(diff);
-    return 1000 * std::exp(-std::pow(bd,2)/(2*std::pow(SIGMA,2)));
+    return std::exp(-std::pow(bd,2)/(2*std::pow(SIGMA,2)));
 }
 
 Graph::Graph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.Height()},
@@ -137,64 +137,58 @@ void Graph::relabel(indType uInd)
         u.vertexHeight = delta + 1;
 }
 
-void Graph::preFlow()
-{   
-    Vertex& source = vertices[sourceInd];
-    source.vertexHeight = numVertices;
-    source.excessFlow = EDGE_MAX;
-    for(auto it: source.neighbors)
-    {
-        indType neighborInd = it.first;
-        vertices[neighborInd].excessFlow = it.second.capacity;
-        vertices[neighborInd].neighbors[sourceInd].capacity = 0;
-    }
-}
-
-
-void Graph::discharge(indType uInd, excessContainer& excessVertices, std::vector<indType>& seen)
+void Graph::discharge(indType uInd, excessContainer &excessVertices)
 {
-    Vertex& u = vertices[uInd];
-    while(u.excessFlow > 0)
+    Vertex &u = vertices[uInd];
+    auto it = u.neighbors.begin();
+    while (u.excessFlow > 0)
     {
-        if(seen[uInd] < numVertices)
-        {
-            indType vInd = seen[uInd];
-            Vertex& v = vertices[vInd];
-            Edge& e_uv = u.neighbors[vInd];
-            Edge& e_vu = v.neighbors[uInd];
-            if(e_uv.capacity - e_uv.flow > 0 && u.vertexHeight > v.vertexHeight)
+        if(it != u.neighbors.end()){
+            indType vInd = it->first;
+            Vertex &v = vertices[vInd];
+            Edge &e_uv = u.neighbors[vInd];
+            if (e_uv.capacity - e_uv.flow > 0 && u.vertexHeight > v.vertexHeight)
+            {
                 push(uInd, vInd, excessVertices);
+            }
             else
-                seen[uInd]++;
-        }
-        else
-        {
+                it++;
+        }else{
             relabel(uInd);
-            seen[uInd] = 0;
+            it=u.neighbors.begin();
         }
     }
 }
 
 valueType Graph::prMaxFlow()
-{
+{   
+    std::cout << "start:" << std::endl;
+    // printTest();
     Vertex& source = vertices[sourceInd];
     source.vertexHeight = numVertices;
     source.excessFlow = EDGE_MAX;
     excessContainer excessVertices;
-    std::vector<indType> seen (numVertices, 0);
 
     for(indType vInd = 0; vInd < numVertices; vInd++)
         push(sourceInd,vInd, excessVertices);
     
+    std::cout << "preFlow:" << std::endl;
+    // printTest();
+    // unsigned counter =0;
     while(!excessVertices.empty())
-    {
+    {   
+        // counter++;
         indType uInd = excessVertices.front();
         Vertex& u = vertices[uInd];
         excessVertices.pop();
         if(uInd != sourceInd && uInd != sinkInd)
-            discharge(uInd, excessVertices, seen);
+            discharge(uInd, excessVertices);
     }
     valueType maxFlow = 0;
+
+    // std::cout << "no excess vertices: " << counter << std::endl;
+    // printTest();
+
     for(auto e: vertices[sourceInd].neighbors)
         maxFlow += e.second.flow;
     return maxFlow;
@@ -328,8 +322,10 @@ bool Graph::prBFS(std::vector<indType>& parent)
         {
             indType next = it.first;
             Edge edge = it.second;
-            if(parent[next] == IND_MAX && edge.capacity-edge.flow > 0)
+
+            if(parent[next] == IND_MAX && edge.capacity-edge.flow > 0.1)
             {
+                // std::cout << current <<"," << next << ": " << edge.capacity-edge.flow << std::endl;
                 parent[next] = current;
                 if(next == sinkInd)
                 {   
@@ -356,7 +352,7 @@ void Graph::prMinCut()
     valueType maxFlow = prMaxFlow();
     std::cout << "maxFlow: " << maxFlow << std::endl;
     std::vector<indType> parent(numVertices, IND_MAX);
-    bfs(parent);
+    prBFS(parent);
     #ifdef DEBUG
         std::cout << "partition done" << std::endl;
     #endif
@@ -370,8 +366,6 @@ void Graph::prMinCut()
                 if (it.first == sourceInd)
                     continue;
                 if(it.first == sinkInd)
-                    continue;
-                if(it.second.capacity == it.second.flow == 0)
                     continue;
                 if (parent[it.first] == IND_MAX)
                 {   
@@ -444,8 +438,8 @@ void Graph::printTest()
         std::cout << "  Edges:    ";
         for(auto it: v.neighbors)
         {   
-            if(it.second.capacity==0 && it.second.flow == 0)
-                continue;
+            // if(it.second.capacity==0 && it.second.flow == 0)
+            //     continue;
             std::cout << std::setw(2) << it.first << "";
             std::cout
             << ":("

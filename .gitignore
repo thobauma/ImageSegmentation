@@ -9,3 +9,7 @@
 imageSegmentation
 
 test.cpp
+
+images/original/
+
+images/segmented/

@@ -8,7 +8,7 @@
 
 using indType = unsigned;
 using valueType = double;
-
+using excessContainer = std::queue<indType>;
 
 valueType boundaryMetric(Color a, Color b);
 valueType calcIntensity(Color pixel);
@@ -39,13 +39,6 @@ struct Vertex
 
 class Graph
 {
-
-    // struct comperator
-    // {
-    //     bool operator()(const Vertex& u, const Vertex& v) const {return u.vertexHeight < v.vertexHeight;}
-    // };
-    // using excessContainer = std::priority_queue<Vertex, std::queue<Vertex>, comperator>;
-    using excessContainer = std::queue<indType>;
 public:
 
 
@@ -72,14 +65,12 @@ public:
     valueType edmondsKarp();
 
     void minCut();
-
-    void preFlow();
     
     void push(indType uInd, indType vInd, excessContainer& excessVertices);
 
     void relabel(indType uInd);
 
-    void discharge(indType uInd, excessContainer& excessVertices, std::vector<indType>& seen);
+    void discharge(indType uInd, excessContainer& excessVertices);
 
     valueType prMaxFlow();
 
