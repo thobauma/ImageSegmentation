@@ -2,11 +2,13 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <queue>
 #include <algorithm>
 #include "bitmap.hpp"
 
 using indType = unsigned;
 using valueType = double;
+using excessContainer = std::queue<indType>;
 
 valueType boundaryMetric(Color a, Color b);
 valueType calcIntensity(Color pixel);
@@ -15,21 +17,31 @@ struct Edge
 {
     valueType capacity;
     valueType residual;
-    Edge(valueType cap): capacity{cap}, residual{cap} {};
-    Edge(): capacity{0}, residual{0} {};
+    valueType flow;
+    Edge(valueType cap): 
+            capacity{cap}, residual{cap}, flow{0} {};
+    Edge(valueType cap, valueType f): 
+            capacity{cap}, residual{cap}, flow{f} {};
+    Edge(): capacity{0}, residual{0}, flow{0} {};
 };
 
 struct Vertex
 {   
     Color color;
+    indType vertexHeight;
+    valueType excessFlow;
     std::unordered_map<indType, Edge> neighbors;
-    Vertex() : color{} {};
-    Vertex(Color c) : color{c} {};
+    Vertex() : color{}, vertexHeight{0}, excessFlow{0} {};
+    Vertex(Color c) : color{c}, vertexHeight{0}, excessFlow{0} {};
 };
+
+
 
 class Graph
 {
 public:
+
+
 
     ~Graph();
 
@@ -41,18 +53,30 @@ public:
 
     Graph(const Bitmap &bitmap);
 
-    void addEdge(indType start, indType end, valueType capacity);
+    void addEdge(indType start, indType end, 
+                valueType capacity, valueType flow);
 
-    void minCut();
-    
     bool bfs(std::vector<indType>& path);
 
     void dfsUtil(indType v, std::vector<bool>& visited);
 
     bool dfs(indType v, std::vector<bool>& visited);
 
-
     valueType edmondsKarp();
+
+    void minCut();
+    
+    void push(indType uInd, indType vInd, excessContainer& excessVertices);
+
+    void relabel(indType uInd);
+
+    void discharge(indType uInd, excessContainer& excessVertices);
+
+    valueType prMaxFlow();
+
+    bool prBFS(std::vector<indType>& parent);
+
+    void prMinCut();
 
     Bitmap graphToBitmap();
 
@@ -84,6 +108,9 @@ private:
     indType height;
     indType sourceInd;
     indType sinkInd;
+
+
+
 
     void nEdges(const Bitmap &bitmap);
     void tEdges(const Bitmap &bitmap);

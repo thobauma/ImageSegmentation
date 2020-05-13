@@ -1,2 +1,15 @@
 
 .idea/
+.ipynb_checkpoints/
+
+*.gch
+
+*.o
+
+imageSegmentation
+
+test.cpp
+
+images/original/
+
+images/segmented/
