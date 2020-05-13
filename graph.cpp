@@ -208,22 +208,6 @@ bool Graph::bfs(std::vector<indType>& parent)
     return false;
 }
 
-void Graph::dfsUtil(indType v, std::vector<bool>& visited)
-{
-    visited[v] = 1;
-    for(auto it: vertices[v].neighbors)
-    {
-        if(!visited[it.first])
-        {
-            dfsUtil(it.first, visited);
-        }
-    }
-}
-bool Graph::dfs(indType v,std::vector<bool>& visited)
-{   
-    dfsUtil(v, visited);
-}
-
 valueType Graph::edmondsKarp()
 {   
     valueType maxFlow = 0;
@@ -338,89 +322,4 @@ Bitmap Graph::graphToBitmap()
         }
     }
     return result;
-}
-
-
-void Graph::printInfo()
-{
-    for(indType i = 0; i < numVertices-2; i++)
-    {   
-        Vertex v = vertices[i];
-        std::cout 
-            // << "Index: " 
-            << std::setw(2) << i << ": "
-            <<"(" << i % width << "," << i / width << "):" 
-            // << "  numEdges: " 
-            << v.neighbors.size() << " ";
-        std::cout
-            << "  Color:"
-            <<"[" << std::setw(5) << v.color.GetR()
-            << "," << std::setw(5) << v.color.GetG()
-            << "," << std::setw(5) << v.color.GetB() 
-            << "]";
-        // std::cout << "  Edges:    ";
-        for(auto it: v.neighbors)
-        {
-            std::cout << std::setw(2) << it.first << ": "
-                <<"("
-                << it.first % width << "," << it.first/ width << "): "
-                << std::setw(8) << it.second.capacity << ","
-                << std::setw(8) << it.second.residual << "  ";
-            if(it.second.residual != it.second.capacity)
-                std::cout << "different! " << "   ";
-        }
-        std::cout << std::endl;
-    }
-    std::cout << "s: " << vertices[sourceInd].neighbors.size() << std::endl;
-    std::cout << "t: " << vertices[sinkInd].neighbors.size() << std::endl;
-}
-
-void Graph::printTest()
-{
-    for(indType i = 0; i < numVertices; i++)
-    {   
-        Vertex v = vertices[i];
-        std::cout 
-            << "Index: " 
-            << std::setw(2) << i << ": "
-            << "  numEdges: " 
-            << v.neighbors.size() << " ";
-        std::cout << "  Edges:    ";
-        for(auto it: v.neighbors)
-        {   
-            // if(it.second.capacity==0 && it.second.flow == 0)
-            //     continue;
-            std::cout << std::setw(2) << it.first << "";
-            std::cout
-            << ":("
-                // << std::setw(3) 
-                << it.second.capacity << ","
-                // << std::setw(3) 
-                << it.second.flow << ")    ";
-            // if(it.second.residual != it.second.capacity)
-            //     std::cout << "different! " << "   ";
-        }
-        std::cout << std::endl;
-    }
-}
-
-void Graph::printParent(std::vector<indType> parent)
-{
-    std::cout << "Parent: ";
-    for(indType curr = sinkInd; curr > 0; curr--)
-    {
-        std::cout << curr << ":" << parent[curr] << " ";
-    }
-    std::cout << std::endl;
-}
-
-void Graph::printPath(std::vector<indType> parent)
-{                 
-    std::cout << "Path:   ";
-    indType curr = sinkInd;
-    while(curr != sourceInd){
-        std::cout << curr << ":"<< parent[curr] << "  ";
-        curr = parent[curr];
-    }
-   std::cout << std::endl;
 }

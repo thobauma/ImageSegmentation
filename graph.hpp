@@ -40,9 +40,6 @@ struct Vertex
 class Graph
 {
 public:
-
-
-
     ~Graph();
 
     Graph(indType n, indType s, indType t): 
@@ -57,10 +54,6 @@ public:
                 valueType capacity, valueType flow);
 
     bool bfs(std::vector<indType>& path);
-
-    void dfsUtil(indType v, std::vector<bool>& visited);
-
-    bool dfs(indType v, std::vector<bool>& visited);
 
     valueType edmondsKarp();
 
@@ -95,11 +88,6 @@ public:
     indType getHeight(){
         return height;
     }
-    
-    void printInfo();
-    void printPath(std::vector<indType> parent);
-    void printParent(std::vector<indType> parent);
-    void printTest();
 
 private:
     std::vector<Vertex> vertices;
@@ -108,9 +96,6 @@ private:
     indType height;
     indType sourceInd;
     indType sinkInd;
-
-
-
 
     void nEdges(const Bitmap &bitmap);
     void tEdges(const Bitmap &bitmap);
