@@ -2,11 +2,13 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <queue>
 #include <algorithm>
 #include "bitmap.hpp"
 
 using indType = unsigned;
 using valueType = double;
+
 
 valueType boundaryMetric(Color a, Color b);
 valueType calcIntensity(Color pixel);
@@ -15,21 +17,38 @@ struct Edge
 {
     valueType capacity;
     valueType residual;
-    Edge(valueType cap): capacity{cap}, residual{cap} {};
-    Edge(): capacity{0}, residual{0} {};
+    valueType flow;
+    Edge(valueType cap): 
+            capacity{cap}, residual{cap}, flow{0} {};
+    Edge(valueType cap, valueType f): 
+            capacity{cap}, residual{cap}, flow{f} {};
+    Edge(): capacity{0}, residual{0}, flow{0} {};
 };
 
 struct Vertex
 {   
     Color color;
+    indType vertexHeight;
+    valueType excessFlow;
     std::unordered_map<indType, Edge> neighbors;
-    Vertex() : color{} {};
-    Vertex(Color c) : color{c} {};
+    Vertex() : color{}, vertexHeight{0}, excessFlow{0} {};
+    Vertex(Color c) : color{c}, vertexHeight{0}, excessFlow{0} {};
 };
+
+
 
 class Graph
 {
+
+    // struct comperator
+    // {
+    //     bool operator()(const Vertex& u, const Vertex& v) const {return u.vertexHeight < v.vertexHeight;}
+    // };
+    // using excessContainer = std::priority_queue<Vertex, std::queue<Vertex>, comperator>;
+    using excessContainer = std::queue<indType>;
 public:
+
+
 
     ~Graph();
 
@@ -41,7 +60,8 @@ public:
 
     Graph(const Bitmap &bitmap);
 
-    void addEdge(indType start, indType end, valueType capacity);
+    void addEdge(indType start, indType end, 
+                valueType capacity, valueType flow);
 
     bool bfs(std::vector<indType>& path);
 
@@ -53,11 +73,19 @@ public:
 
     void minCut();
 
-    bool push(Vertex v);
+    void preFlow();
+    
+    void push(indType uInd, indType vInd, excessContainer& excessVertices);
 
-    void relabel(Vertex v);
+    void relabel(indType uInd);
 
+    void discharge(indType uInd, excessContainer& excessVertices, std::vector<indType>& seen);
 
+    valueType prMaxFlow();
+
+    bool prBFS(std::vector<indType>& parent);
+
+    void prMinCut();
 
     Bitmap graphToBitmap();
 
@@ -89,6 +117,9 @@ private:
     indType height;
     indType sourceInd;
     indType sinkInd;
+
+
+
 
     void nEdges(const Bitmap &bitmap);
     void tEdges(const Bitmap &bitmap);

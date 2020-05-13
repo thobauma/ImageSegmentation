@@ -2,7 +2,6 @@
 
 #include "bitmap.hpp"
 #include "graph.hpp"
-#include "prGraph.hpp"
 #define DEBUG
 
 void ShowResult(const Bitmap& original, Graph& graph, const std::string& filename){
@@ -27,36 +26,61 @@ void test(std::vector<std::string>& files)
         std::cout << std::endl << filename << ": " << std::endl;
         Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
         Graph g(bitmap);
+        // g.prMinCut();
         g.minCut();
         ShowResult(bitmap, g, filename);
     }
 }
 
-int main(){
-    // std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
-    // std::string filename;
-    // #ifdef DEBUG
-    //     filename = "debug";
-    // #else
-    //     std::cin >> filename;
-    // #endif
-    // Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
-    // #ifdef DEBUG
-    //     std::cout << std::endl << "bitmap initalized" << std::endl;
-    // #endif
-    // Graph g(bitmap);
-    // #ifdef DEBUG
-    //     std::cout << "graph initialized" << std::endl;
-    //     // g.printTest();
-    // #endif
-    // g.minCut();
-    // #ifdef DEBUG
-    //     // g.printTest();
-    //     std::cout << "minCut done" << std::endl;
-    // #endif
-    // ShowResult(bitmap, g, filename);
+Graph testGraph()
+{
+    Graph g(6, 0, 5);
+    g.addEdge(0, 1,16, 0);
+    g.addEdge(0, 2,13, 0);
+    g.addEdge(1, 2,10, 0);
+    g.addEdge(1, 3,12, 0);
+    g.addEdge(2, 1, 4, 0);
+    g.addEdge(2, 4,14, 0);
+    g.addEdge(3, 2, 9, 0);
+    g.addEdge(3, 5,20, 0);
+    g.addEdge(4, 3, 7, 0);
+    g.addEdge(4, 5, 4, 0);
+    g.printTest();
+    auto mf = g.prMaxFlow();
+    std::cout << "max flow: " << mf << std::endl;
+    g.printTest();
+    return g;
+}
 
-    std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
-    test(files);
+int main(){
+    // testGraph();
+    std::string filename;
+    #ifndef DEBUG
+        std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
+    #endif
+    #ifdef DEBUG
+        filename = "debug";
+    #else
+        std::cin >> filename;
+    #endif
+    Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
+    #ifdef DEBUG
+        std::cout << std::endl << "bitmap initalized" << std::endl;
+    #endif
+    Graph g(bitmap);
+    #ifdef DEBUG
+        std::cout << "graph initialized" << std::endl;
+        g.printTest();
+    #endif
+    g.prMinCut();
+    // g.minCut();
+    #ifdef DEBUG
+        g.printTest();
+        std::cout << "minCut done" << std::endl;
+    #endif
+    ShowResult(bitmap, g, filename);
+
+    // std::vector<std::string> files = {"bird", "debug", "peppers", "sailboat", "test1","test2", "test3"};
+    // test(files);
     return 0;
 }
