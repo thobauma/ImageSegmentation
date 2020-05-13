@@ -27,7 +27,7 @@ void test(std::vector<std::string>& files)
 
 int main(){
     std::string filename;
-        std::cout << "image name (e.g. test1, test2, test3)?" << std::endl;
+        std::cout << "image name (e.g. test1, test2, test3, bird, peppers, sailboat)?" << std::endl;
         std::cin >> filename;
     Bitmap bitmap = readpgm("./images/" + filename + ".pgm");
     Graph g(bitmap);

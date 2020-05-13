@@ -1,9 +1,7 @@
 #include <stdlib.h>
 #include <unordered_map>
 #include <vector>
-#include <string>
 #include <queue>
-#include <algorithm>
 #include "bitmap.hpp"
 
 using indType = unsigned;

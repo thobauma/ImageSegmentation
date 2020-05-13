@@ -1,9 +1,6 @@
 #include <iostream>
 #include <queue>
-#include <fstream>
-#include <string>
 #include <limits>
-#include <iomanip>
 #include <cmath>
 #include "graph.hpp"
 
@@ -148,8 +145,6 @@ void Graph::discharge(indType uInd, excessContainer &excessVertices)
 
 valueType Graph::prMaxFlow()
 {   
-    std::cout << "start:" << std::endl;
-    // printTest();
     Vertex& source = vertices[sourceInd];
     source.vertexHeight = numVertices;
     source.excessFlow = EDGE_MAX;
@@ -157,24 +152,15 @@ valueType Graph::prMaxFlow()
 
     for(indType vInd = 0; vInd < numVertices; vInd++)
         push(sourceInd,vInd, excessVertices);
-    
-    std::cout << "preFlow:" << std::endl;
-    // printTest();
-    // unsigned counter =0;
+
     while(!excessVertices.empty())
     {   
-        // counter++;
         indType uInd = excessVertices.front();
-        Vertex& u = vertices[uInd];
         excessVertices.pop();
         if(uInd != sourceInd && uInd != sinkInd)
             discharge(uInd, excessVertices);
     }
     valueType maxFlow = 0;
-
-    // std::cout << "no excess vertices: " << counter << std::endl;
-    // printTest();
-
     for(auto e: vertices[sourceInd].neighbors)
         maxFlow += e.second.flow;
     return maxFlow;
