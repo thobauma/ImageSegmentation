@@ -45,11 +45,12 @@ prGraph::prGraph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.He
     for (indType x = 0; x < width; x++)
     {
         for(indType y = 0; y < height; y++)
-        {
+        {   
             Vertex v(bitmap(x,y));
             vertices[ind(x,y,width)] = v;
         }
     }
+
     #ifdef DEBUG
         std::cout <<  "vertices.size: " << vertices.size() << std::endl;
         std::cout << "colors init" << std::endl;
@@ -70,9 +71,9 @@ prGraph::~prGraph()
     vertices.clear();
 }
 
-void prGraph::addEdge(indType start, indType end, valueType capacity)
+void prGraph::addEdge(indType start, indType end, valueType capacity, valueType flow)
 {
-    Edge e(capacity);
+    Edge e(capacity, flow);
     vertices[start].neighbors.insert({end, e});
 }
 
@@ -85,31 +86,126 @@ void prGraph::nEdges(const Bitmap &bitmap)
             if (x + 1 < width)
             {
                 valueType bp_ij_right = boundaryMetric(bitmap(x, y), bitmap(x + 1, y));
-                addEdge(ind(x, y, width), ind(x + 1, y, width), bp_ij_right);
-                addEdge(ind(x + 1, y, width), ind(x, y, width), bp_ij_right);
+                addEdge(ind(x, y, width), ind(x + 1, y, width), bp_ij_right, 0);
+                addEdge(ind(x + 1, y, width), ind(x, y, width), bp_ij_right, 0);
             }
             if (y + 1 < height)
             {
                 valueType bp_ij_low = boundaryMetric(bitmap(x, y), bitmap(x, y + 1));
-                addEdge(ind(x, y, width), ind(x, y + 1, width), bp_ij_low);
-                addEdge(ind(x, y + 1, width), ind(x, y, width), bp_ij_low);
+                addEdge(ind(x, y, width), ind(x, y + 1, width), bp_ij_low, 0);
+                addEdge(ind(x, y + 1, width), ind(x, y, width), bp_ij_low, 0);
             }
         }
     }
 }
 
 void prGraph::tEdges(const Bitmap& bitmap)
-{
+{   
     for (indType x = 0; x < width; x++)
     {
         for(indType y = 0; y < height; y++)
         {   
             valueType intensity = calcIntensity(bitmap(x,y));
-            addEdge(ind(x, y, width),sinkInd, 255 - intensity);
-            addEdge(sourceInd, ind(x, y, width), intensity);
+            addEdge(ind(x, y, width),sinkInd, 255 - intensity, 0);
+            addEdge(sourceInd, ind(x, y, width), intensity, 0);
         }
     }
 }
+
+void prGraph::push(indType uInd, indType vInd, excessContainer& excessVertices)
+{   
+    Vertex& u = vertices[uInd];
+    Vertex& v = vertices[vInd];
+    Edge& e_uv = u.neighbors[vInd];
+    Edge& e_vu = v.neighbors[uInd];
+    valueType delta = std::min(u.excessFlow, e_uv.capacity-e_uv.flow);
+    e_uv.flow += delta;
+    e_vu.flow -= delta;
+    u.excessFlow -= delta;
+    v.excessFlow += delta;
+    if(delta > 0 && v.excessFlow == delta)
+        excessVertices.push(vInd);
+}
+
+
+void prGraph::relabel(indType uInd)
+{
+    indType delta = IND_MAX;
+    Vertex& u = vertices[uInd];
+    for(auto it: u.neighbors)
+    {
+        indType vInd = it.first;
+        Edge& e_uv = it.second;
+        if(e_uv.capacity - e_uv.flow > 0)
+            delta = std::min(delta, vertices[vInd].vertexHeight);
+    }
+    if(delta < IND_MAX)
+        u.vertexHeight = delta + 1;
+}
+
+void prGraph::preFlow()
+{   
+    Vertex& source = vertices[sourceInd];
+    source.vertexHeight = numVertices;
+    source.excessFlow = EDGE_MAX;
+    for(auto it: source.neighbors)
+    {
+        indType neighborInd = it.first;
+        vertices[neighborInd].excessFlow = it.second.capacity;
+        vertices[neighborInd].neighbors[sourceInd].capacity = 0;
+    }
+}
+
+
+void prGraph::discharge(indType uInd, excessContainer& excessVertices, std::vector<indType>& seen)
+{
+    Vertex& u = vertices[uInd];
+    while(u.excessFlow > 0)
+    {
+        if(seen[uInd] < numVertices)
+        {
+            indType vInd = seen[uInd];
+            Vertex& v = vertices[vInd];
+            Edge& e_uv = u.neighbors[vInd];
+            Edge& e_vu = v.neighbors[uInd];
+            if(e_uv.capacity - e_uv.flow > 0 && u.vertexHeight > v.vertexHeight)
+                push(uInd, vInd, excessVertices);
+            else
+                seen[uInd]++;
+        }
+        else
+        {
+            relabel(uInd);
+            seen[uInd] = 0;
+        }
+    }
+}
+
+valueType prGraph::prMaxFlow()
+{
+    Vertex& source = vertices[sourceInd];
+    source.vertexHeight = numVertices;
+    source.excessFlow = EDGE_MAX;
+    excessContainer excessVertices;
+    std::vector<indType> seen (numVertices, 0);
+
+    for(indType vInd = 0; vInd < numVertices; vInd++)
+        push(sourceInd,vInd, excessVertices);
+    
+    while(!excessVertices.empty())
+    {
+        indType uInd = excessVertices.front();
+        Vertex& u = vertices[uInd];
+        excessVertices.pop();
+        if(uInd != sourceInd && uInd != sinkInd)
+            discharge(uInd, excessVertices, seen);
+    }
+    valueType maxFlow = 0;
+    for(auto e: vertices[sourceInd].neighbors)
+        maxFlow += e.second.flow;
+    return maxFlow;
+}
+
 
 bool prGraph::bfs(std::vector<indType>& parent)
 {   
@@ -223,17 +319,6 @@ void prGraph::minCut()
     #ifdef DEBUG
         std::cout << "cut done" << std::endl;
     #endif
-}
-
-bool prGraph::push(Vertex v)
-{
-
-}
-
-
-void prGraph::relabel(Vertex v)
-{
-
 }
 
 

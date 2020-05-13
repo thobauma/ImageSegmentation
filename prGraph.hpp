@@ -2,11 +2,13 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <queue>
 #include <algorithm>
 #include "bitmap.hpp"
 
 using indType = unsigned;
 using valueType = double;
+
 
 valueType boundaryMetric(Color a, Color b);
 valueType calcIntensity(Color pixel);
@@ -16,7 +18,10 @@ struct Edge
     valueType capacity;
     valueType residual;
     valueType flow;
-    Edge(valueType cap): capacity{cap}, residual{cap}, flow{0} {};
+    Edge(valueType cap): 
+            capacity{cap}, residual{cap}, flow{0} {};
+    Edge(valueType cap, valueType f): 
+            capacity{cap}, residual{cap}, flow{f} {};
     Edge(): capacity{0}, residual{0}, flow{0} {};
 };
 
@@ -30,9 +35,20 @@ struct Vertex
     Vertex(Color c) : color{c}, vertexHeight{0}, excessFlow{0} {};
 };
 
+
+
 class prGraph
 {
+
+    // struct comperator
+    // {
+    //     bool operator()(const Vertex& u, const Vertex& v) const {return u.vertexHeight < v.vertexHeight;}
+    // };
+    // using excessContainer = std::priority_queue<Vertex, std::queue<Vertex>, comperator>;
+    using excessContainer = std::queue<indType>;
 public:
+
+
 
     ~prGraph();
 
@@ -44,7 +60,8 @@ public:
 
     prGraph(const Bitmap &bitmap);
 
-    void addEdge(indType start, indType end, valueType capacity);
+    void addEdge(indType start, indType end, 
+                valueType capacity, valueType flow);
 
     bool bfs(std::vector<indType>& path);
 
@@ -56,10 +73,19 @@ public:
 
     void minCut();
 
-    bool push(Vertex v);
+    void preFlow();
+    
+    void push(indType uInd, indType vInd, excessContainer& excessVertices);
 
-    void relabel(Vertex v);
+    void relabel(indType uInd);
 
+    void discharge(indType uInd, excessContainer& excessVertices, std::vector<indType>& seen);
+
+    
+
+
+
+    valueType prMaxFlow();
 
 
     Bitmap graphToBitmap();
@@ -92,6 +118,9 @@ private:
     indType height;
     indType sourceInd;
     indType sinkInd;
+
+
+
 
     void nEdges(const Bitmap &bitmap);
     void tEdges(const Bitmap &bitmap);
