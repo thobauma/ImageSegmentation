@@ -9,11 +9,13 @@ bitmap.o: bitmap.cpp bitmap.hpp
 graph.o: graph.cpp graph.hpp
 	$(CC) $(CXXFLAGS) -c $^
 
-
-main.o: main.cpp graph.hpp
+prGraph.o: prGraph.cpp prGraph.hpp
 	$(CC) $(CXXFLAGS) -c $^
 
-imageSegmentation: main.o graph.o bitmap.o
+main.o: main.cpp graph.hpp prGraph.hpp
+	$(CC) $(CXXFLAGS) -c $^
+
+imageSegmentation: main.o graph.o prGraph.o bitmap.o
 	$(CC) $(CXXFLAGS) -o $@ $^
 clean:
 	rm -f *.o 

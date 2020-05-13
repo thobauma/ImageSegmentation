@@ -5,7 +5,7 @@
 #include <limits>
 #include <iomanip>
 #include <cmath>
-#include "graph.hpp"
+#include "prGraph.hpp"
 
 // #define DEBUG
 
@@ -32,7 +32,7 @@ valueType boundaryMetric(Color a, Color b)
     return 1000 * std::exp(-std::pow(bd,2)/(2*std::pow(SIGMA,2)));
 }
 
-Graph::Graph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.Height()},
+prGraph::prGraph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.Height()},
                 numVertices{bitmap.Width() * bitmap.Height() + 2}, vertices(bitmap.Width() * bitmap.Height() + 2, Vertex()),
                 sourceInd{bitmap.Width() * bitmap.Height()}, sinkInd{bitmap.Width() * bitmap.Height() + 1}
 {   
@@ -65,18 +65,18 @@ Graph::Graph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.Height
     
 }
 
-Graph::~Graph()
+prGraph::~prGraph()
 {
     vertices.clear();
 }
 
-void Graph::addEdge(indType start, indType end, valueType capacity)
+void prGraph::addEdge(indType start, indType end, valueType capacity)
 {
     Edge e(capacity);
     vertices[start].neighbors.insert({end, e});
 }
 
-void Graph::nEdges(const Bitmap &bitmap) 
+void prGraph::nEdges(const Bitmap &bitmap) 
 {
     for (indType x = 0; x < width; x++)
     {
@@ -98,7 +98,7 @@ void Graph::nEdges(const Bitmap &bitmap)
     }
 }
 
-void Graph::tEdges(const Bitmap& bitmap)
+void prGraph::tEdges(const Bitmap& bitmap)
 {
     for (indType x = 0; x < width; x++)
     {
@@ -111,7 +111,7 @@ void Graph::tEdges(const Bitmap& bitmap)
     }
 }
 
-bool Graph::bfs(std::vector<indType>& parent)
+bool prGraph::bfs(std::vector<indType>& parent)
 {   
     std::queue<indType> queue;
     std::fill(parent.begin(), parent.end(), IND_MAX);
@@ -147,7 +147,7 @@ bool Graph::bfs(std::vector<indType>& parent)
     return false;
 }
 
-void Graph::dfsUtil(indType v, std::vector<bool>& visited)
+void prGraph::dfsUtil(indType v, std::vector<bool>& visited)
 {
     visited[v] = 1;
     for(auto it: vertices[v].neighbors)
@@ -158,12 +158,12 @@ void Graph::dfsUtil(indType v, std::vector<bool>& visited)
         }
     }
 }
-bool Graph::dfs(indType v,std::vector<bool>& visited)
+bool prGraph::dfs(indType v,std::vector<bool>& visited)
 {   
     dfsUtil(v, visited);
 }
 
-valueType Graph::edmondsKarp()
+valueType prGraph::edmondsKarp()
 {   
     valueType maxFlow = 0;
     std::vector<indType> parent(numVertices);
@@ -192,7 +192,7 @@ valueType Graph::edmondsKarp()
     return maxFlow;
 }
 
-void Graph::minCut()
+void prGraph::minCut()
 {
     valueType maxFlow = edmondsKarp();
     std::cout << "maxFlow: " << maxFlow << std::endl;
@@ -225,19 +225,19 @@ void Graph::minCut()
     #endif
 }
 
-bool Graph::push(Vertex v)
+bool prGraph::push(Vertex v)
 {
 
 }
 
 
-void Graph::relabel(Vertex v)
+void prGraph::relabel(Vertex v)
 {
 
 }
 
 
-Bitmap Graph::graphToBitmap()
+Bitmap prGraph::graphToBitmap()
 {
     Bitmap result(width, height);
     for(indType y = 0; y < height; ++y)
@@ -252,7 +252,7 @@ Bitmap Graph::graphToBitmap()
 }
 
 
-void Graph::printInfo()
+void prGraph::printInfo()
 {
     for(indType i = 0; i < numVertices-2; i++)
     {   
@@ -286,7 +286,7 @@ void Graph::printInfo()
     std::cout << "t: " << vertices[sinkInd].neighbors.size() << std::endl;
 }
 
-void Graph::printTest()
+void prGraph::printTest()
 {
     for(indType i = 0; i < numVertices; i++)
     {   
@@ -310,7 +310,7 @@ void Graph::printTest()
     }
 }
 
-void Graph::printParent(std::vector<indType> parent)
+void prGraph::printParent(std::vector<indType> parent)
 {
     std::cout << "Parent: ";
     for(indType curr = sinkInd; curr > sourceInd; curr--)
@@ -319,7 +319,7 @@ void Graph::printParent(std::vector<indType> parent)
     }
     std::cout << std::endl;
 }
-void Graph::printPath(std::vector<indType> parent)
+void prGraph::printPath(std::vector<indType> parent)
 {                 
     std::cout << "Path:   ";
     indType curr = sinkInd;

@@ -30,19 +30,19 @@ struct Vertex
     Vertex(Color c) : color{c}, vertexHeight{0}, excessFlow{0} {};
 };
 
-class Graph
+class prGraph
 {
 public:
 
-    ~Graph();
+    ~prGraph();
 
-    Graph(indType n, indType s, indType t): 
+    prGraph(indType n, indType s, indType t): 
         vertices(n, Vertex()), numVertices{n},
         width{0}, height{0},
         sourceInd{s}, sinkInd{t}
         {};
 
-    Graph(const Bitmap &bitmap);
+    prGraph(const Bitmap &bitmap);
 
     void addEdge(indType start, indType end, valueType capacity);
 

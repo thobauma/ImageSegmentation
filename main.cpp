@@ -2,6 +2,7 @@
 
 #include "bitmap.hpp"
 #include "graph.hpp"
+#include "prGraph.hpp"
 #define DEBUG
 
 void ShowResult(const Bitmap& original, Graph& graph, const std::string& filename){
