@@ -1,14 +1,2 @@
 
-thobauma/.ipynb_checkpoints/
-
 .idea/
-
-thobauma/build/
-
-thobauma/cmake-build-debug/
-
-*.o
-
-*.gch
-
-thobauma/imageSegmentation
