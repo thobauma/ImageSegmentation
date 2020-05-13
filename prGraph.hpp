@@ -15,16 +15,19 @@ struct Edge
 {
     valueType capacity;
     valueType residual;
-    Edge(valueType cap): capacity{cap}, residual{cap} {};
-    Edge(): capacity{0}, residual{0} {};
+    valueType flow;
+    Edge(valueType cap): capacity{cap}, residual{cap}, flow{0} {};
+    Edge(): capacity{0}, residual{0}, flow{0} {};
 };
 
 struct Vertex
 {   
     Color color;
+    indType vertexHeight;
+    valueType excessFlow;
     std::unordered_map<indType, Edge> neighbors;
-    Vertex() : color{} {};
-    Vertex(Color c) : color{c} {};
+    Vertex() : color{}, vertexHeight{0}, excessFlow{0} {};
+    Vertex(Color c) : color{c}, vertexHeight{0}, excessFlow{0} {};
 };
 
 class Graph
