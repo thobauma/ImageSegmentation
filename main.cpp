@@ -5,9 +5,9 @@
 
 void ShowResult(const Bitmap& original, Graph& graph, const std::string& filename){
     Bitmap resbmp = graph.graphToBitmap();
-    std::string originalF = "./images/original/"+filename+"Original.bmp";
+    std::string originalF = "./cx_out/"+filename+"Original.bmp";
     original.Save(originalF);
-    std::string resultF = "./images/segmented/"+filename+"Seg.bmp";
+    std::string resultF = "./cx_out/"+filename+"Seg.bmp";
     resbmp.Save(resultF);
 
 }
