@@ -7,8 +7,6 @@
 #include <cmath>
 #include "graph.hpp"
 
-// #define DEBUG
-
 #define SIGMA 30
 
 valueType EDGE_MAX = std::numeric_limits<valueType>::max();
@@ -44,20 +42,8 @@ Graph::Graph(const Bitmap &bitmap) : width{bitmap.Width()}, height{bitmap.Height
             vertices[ind(x,y,width)] = v;
         }
     }
-
-    #ifdef DEBUG
-        std::cout <<  "vertices.size: " << vertices.size() << std::endl;
-        std::cout << "colors init" << std::endl;
-    #endif
     nEdges(bitmap);
-    #ifdef DEBUG
-        std::cout << "nEdges done" << std::endl;
-    #endif
     tEdges(bitmap);
-    #ifdef DEBUG
-        std::cout << "tEdges done" << std::endl;
-    #endif
-    
 }
 
 Graph::~Graph()
@@ -213,21 +199,12 @@ bool Graph::bfs(std::vector<indType>& parent)
                 parent[next] = current;
                 if(next == sinkInd)
                 {   
-                    #ifdef DEBUG
-                        std::cout << "BFS: True" << std::endl;
-                        printParent(parent);
-                        printPath(parent);
-                    #endif
                     return true;
                 }
                 queue.push(next);
             }
         }
     }
-    #ifdef DEBUG
-        std::cout << "BFS: False" << std::endl;
-        printParent(parent);
-    #endif
     return false;
 }
 
@@ -269,9 +246,6 @@ valueType Graph::edmondsKarp()
             current = previous;
         }
         maxFlow += pathFlow;
-        #ifdef DEBUG
-            printTest();
-        #endif
     }
     return maxFlow;
 }
@@ -282,9 +256,6 @@ void Graph::minCut()
     std::cout << "maxFlow: " << maxFlow << std::endl;
     std::vector<indType> parent(numVertices, IND_MAX);
     bfs(parent);
-    #ifdef DEBUG
-        std::cout << "partition done" << std::endl;
-    #endif
     for (indType vInd = 0; vInd < numVertices-2; vInd++)
     {
         Vertex& v = vertices[vInd];
@@ -296,17 +267,11 @@ void Graph::minCut()
                     continue;
                 if (parent[it.first] == IND_MAX)
                 {   
-                    // #ifdef DEBUG
-                    //     std::cout << "ind: "<< vInd << std::endl;
-                    // #endif
                     v.color = Color(255. / 256, 0, 0);
                 }
             }
         }
     }
-    #ifdef DEBUG
-        std::cout << "cut done" << std::endl;
-    #endif
 }
 
 bool Graph::prBFS(std::vector<indType>& parent)
@@ -325,25 +290,13 @@ bool Graph::prBFS(std::vector<indType>& parent)
 
             if(parent[next] == IND_MAX && edge.capacity-edge.flow > 0.1)
             {
-                // std::cout << current <<"," << next << ": " << edge.capacity-edge.flow << std::endl;
                 parent[next] = current;
                 if(next == sinkInd)
-                {   
-                    #ifdef DEBUG
-                        std::cout << "BFS: True" << std::endl;
-                        printParent(parent);
-                        printPath(parent);
-                    #endif
                     return true;
-                }
                 queue.push(next);
             }
         }
     }
-    #ifdef DEBUG
-        std::cout << "BFS: False" << std::endl;
-        printParent(parent);
-    #endif
     return false;
 }
 
@@ -353,9 +306,6 @@ void Graph::prMinCut()
     std::cout << "maxFlow: " << maxFlow << std::endl;
     std::vector<indType> parent(numVertices, IND_MAX);
     prBFS(parent);
-    #ifdef DEBUG
-        std::cout << "partition done" << std::endl;
-    #endif
     for (indType vInd = 0; vInd < numVertices-2; vInd++)
     {
         Vertex& v = vertices[vInd];
