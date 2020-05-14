@@ -19,5 +19,6 @@ clean:
 	rm -f *.o 
 	rm -f *.hpp.gch
 	rm imageSegmentation
-	rm images/original/*
-	rm images/segmented/*
+	rm ./cx_out/*
+	rm ./images/original/*
+	rm ./images/segmented/*
